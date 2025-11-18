@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=League+Script&family=Noto+Serif+Hebrew:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Puppies+Play&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply m-0 bg-bg text-text-base font-primary antialiased;
+  }
+
+  a {
+    @apply no-underline;
+  }
+
+  ul,
+  ol {
+    @apply list-none;
+  }
+}
