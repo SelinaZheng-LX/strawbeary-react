@@ -1,47 +1,52 @@
 import { useCallback, useMemo, useState } from "react";
-
+import threecake from "./images/threecake.png";
+import cake from "./images/cake.png";
+import cakeslice from "./images/cakeslice.webp";
+import drink from "./images/drink.png";
+import drink2 from "./images/drink2.webp";
+import latte from "./images/latte.webp";
 const menuDishes = [
     {
         dishName: "Strawbeary Jam",
         description:
             "A delightful jammy dessert made from fresh strawberries and a hint of mint.",
         price: 5.99,
-        imageURL: "images/cake.png",
+        imageURL: cake,
     },
     {
         dishName: "Strawbeary Delight",
         description:
             "A layered dessert with strawberries, cream, and fluffy cake.",
         price: 6.49,
-        imageURL: "images/cakeslice.webp",
+        imageURL: cakeslice,
     },
     {
         dishName: "Strawbeary Combo",
         description:
             "Get three flavors of our signature cupcakes in one combo!",
         price: 24.99,
-        imageURL: "images/threecake.png",
+        imageURL: threecake,
     },
     {
         dishName: "Strawbeary Sparkle",
         description:
             "A refreshing blend of strawberries and sparkling water. Hints of refreshing mint.",
         price: 12.99,
-        imageURL: "images/drink.png",
+        imageURL: drink,
     },
     {
         dishName: "Strawbeary Juice",
         description:
             "An aromatic juice made from fresh strawberries and a hint of mint.",
         price: 6.99,
-        imageURL: "images/drink2.webp",
+        imageURL: drink2,
     },
     {
         dishName: "Strawbeary Latte",
         description:
             "A creamy latte made with fresh strawberries, milk, and a touch of honey.",
         price: 7.49,
-        imageURL: "images/latte.webp",
+        imageURL: latte,
     },
 ];
 
@@ -163,40 +168,41 @@ function App() {
                 id="navBarSection"
                 className="sticky top-0 z-50 bg-bg shadow-md"
             >
-                <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+                <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-6">
                     <div className="text-center">
-                        <h1 className="font-secondary text-2xl uppercase tracking-wide">
+                        <h1 className="font-secondary text-xl uppercase tracking-wide md:text-2xl">
                             STRAWBEARY
                         </h1>
-                        <h2 className="-mt-1 font-cursive text-2xl text-accent">
+                        <h2 className="-mt-1 font-cursive text-xl text-accent md:text-2xl font-semibold">
                             cafe
                         </h2>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 md:gap-4">
                         <button
                             type="button"
-                            className="relative flex h-11 w-11 flex-col items-center justify-center gap-2 rounded-full bg-secondary text-text-base transition hover:shadow-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:hidden"
+                            className="relative flex h-10 w-10 items-center justify-center rounded-lg bg-secondary text-text-base transition hover:bg-secondary/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:hidden"
                             aria-label="Toggle navigation"
+                            aria-expanded={isMenuOpen}
                             onClick={() => setIsMenuOpen((prev) => !prev)}
                         >
                             <span
-                                className={`h-0.5 w-7 rounded-full bg-text-base transition ${
+                                className={`absolute h-0.5 w-6 rounded-full bg-text-base transition-all duration-300 ${
                                     isMenuOpen
-                                        ? "translate-y-1.5 rotate-45"
-                                        : ""
+                                        ? "rotate-45 translate-y-0"
+                                        : "-translate-y-2"
                                 }`}
                             ></span>
                             <span
-                                className={`h-0.5 w-7 rounded-full bg-text-base ${
-                                    isMenuOpen ? "opacity-0" : ""
+                                className={`h-0.5 w-6 rounded-full bg-text-base transition-all duration-300 ${
+                                    isMenuOpen ? "opacity-0" : "opacity-100"
                                 }`}
                             ></span>
                             <span
-                                className={`h-0.5 w-7 rounded-full bg-text-base transition ${
+                                className={`absolute h-0.5 w-6 rounded-full bg-text-base transition-all duration-300 ${
                                     isMenuOpen
-                                        ? "-translate-y-1.5 -rotate-45"
-                                        : ""
+                                        ? "-rotate-45 translate-y-0"
+                                        : "translate-y-2"
                                 }`}
                             ></span>
                         </button>
@@ -205,37 +211,48 @@ function App() {
                             id="open-cart"
                             type="button"
                             onClick={() => setIsCartOpen(true)}
-                            className="relative inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 font-semibold uppercase tracking-wide text-white shadow-button transition hover:bg-[#ff1e4e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:px-6"
+                            className="relative inline-flex items-center gap-2 rounded-full bg-accent px-3 py-2 text-sm font-semibold uppercase tracking-wide text-white shadow-button transition hover:bg-[#ff1e4e] active:translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:px-6 md:text-base"
                         >
-                            <span role="img" aria-label="cart">
+                            <span
+                                className="hidden md:inline"
+                                role="img"
+                                aria-label="cart"
+                            >
                                 🛒
                             </span>
                             <span className="hidden md:inline">
                                 Cart ({cartCount})
                             </span>
-                            <span className="text-sm md:hidden">
-                                {cartCount}
+                            <span className="md:hidden">
+                                🛒{" "}
+                                {cartCount > 0 && (
+                                    <span className="ml-1">{cartCount}</span>
+                                )}
                             </span>
                         </button>
                     </div>
                 </nav>
-                <ul
-                    className={`mx-auto max-w-6xl flex-col items-center gap-6 px-4 pb-4 transition-all duration-300 md:flex md:flex-row md:justify-center md:pb-0 ${
-                        isMenuOpen ? "flex" : "hidden md:flex"
+                <div
+                    className={`overflow-hidden transition-all duration-300 ${
+                        isMenuOpen
+                            ? "max-h-64 opacity-100"
+                            : "max-h-0 opacity-0 md:max-h-none md:opacity-100"
                     }`}
                 >
-                    {navLinks.map((link) => (
-                        <li key={link.href}>
-                            <a
-                                href={link.href}
-                                onClick={handleNavClick}
-                                className="text-lg font-semibold text-text-base transition hover:text-accent"
-                            >
-                                {link.label}
-                            </a>
-                        </li>
-                    ))}
-                </ul>
+                    <ul className="mx-auto flex max-w-6xl flex-col items-center gap-4 border-t border-secondary/30 bg-bg px-4 py-4 md:flex-row md:justify-center md:border-t-0 md:py-0">
+                        {navLinks.map((link) => (
+                            <li key={link.href}>
+                                <a
+                                    href={link.href}
+                                    onClick={handleNavClick}
+                                    className="block text-base font-semibold text-text-base transition hover:text-accent md:text-lg"
+                                >
+                                    {link.label}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </section>
 
             <section
@@ -244,7 +261,7 @@ function App() {
             >
                 <div className="relative flex min-h-[70vh] w-full flex-col justify-between gap-8 overflow-hidden bg-pink-stripes px-6 py-16 md:flex-row md:px-12 lg:px-20">
                     <div className="z-10 max-w-xl space-y-4 text-left md:w-1/2">
-                        <h2 className="font-cursive text-3xl text-accent md:text-4xl">
+                        <h2 className="font-cursive text-3xl text-accent md:text-4xl font-semibold">
                             strawbeary cafe
                         </h2>
                         <h1 className="font-secondary text-4xl uppercase leading-tight md:text-5xl">
@@ -267,12 +284,501 @@ function App() {
 
                     <div className="relative flex h-72 w-full items-center justify-center md:h-auto md:w-1/2">
                         <img
-                            src="images/threecake.png"
+                            src={threecake}
                             alt="cupcake trio"
                             className="h-full w-full max-w-lg rounded-[3rem] object-cover shadow-card"
                         />
                     </div>
                 </div>
+            </section>
+
+            <section id="body" className="bg-bg px-4 py-16 md:px-12 lg:px-20">
+                <div
+                    id="about"
+                    className="mx-auto flex max-w-6xl flex-col items-center gap-8 rounded-3xl bg-white/80 p-8 shadow-card md:flex-row"
+                >
+                    <div className="flex w-full flex-col items-center text-center md:w-1/3">
+                        <h1 className="font-secondary text-3xl text-accent">
+                            Made for you
+                        </h1>
+                        <h2 className="font-cursive text-2xl text-text-base font-semibold">
+                            {"{ With love }"}
+                        </h2>
+                    </div>
+                    <p className="w-full text-lg leading-relaxed text-text-base/80 md:w-2/3">
+                        Welcome to Strawbeary Cafe, where every bite is a
+                        delight! Our cafe is a cozy haven for food lovers,
+                        offering a delightful menu filled with fresh, locally
+                        sourced ingredients. From our signature strawberry
+                        desserts to savory dishes, we pride ourselves on
+                        creating meals that bring joy and satisfaction. Whether
+                        you&apos;re stopping by for a quick coffee or settling
+                        in for a hearty meal, Strawbeary Cafe promises an
+                        unforgettable dining experience. Join us and taste the
+                        love in every bite!
+                    </p>
+                </div>
+
+                <div className="mx-auto mt-16 max-w-6xl text-center">
+                    <h1 className="font-secondary text-3xl text-accent">
+                        Our Menu
+                    </h1>
+                    <div className="mt-8 overflow-x-auto rounded-3xl bg-white shadow-card">
+                        <table className="min-w-full divide-y divide-secondary/60 text-left">
+                            <thead className="bg-primary/60 text-sm font-semibold uppercase text-text-base">
+                                <tr>
+                                    <th className="px-4 py-3">Image</th>
+                                    <th className="px-4 py-3">Dish Name</th>
+                                    <th className="px-4 py-3 hidden md:table-cell">
+                                        Description
+                                    </th>
+                                    <th className="px-4 py-3">Price</th>
+                                    <th className="px-4 py-3 text-center">
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-secondary/30 text-base">
+                                {menuDishes.map((dish) => (
+                                    <tr
+                                        key={dish.dishName}
+                                        className="hover:bg-tertiary/50"
+                                    >
+                                        <td className="px-4 py-4">
+                                            <img
+                                                src={dish.imageURL}
+                                                alt={dish.dishName}
+                                                className="h-32 w-32 rounded-2xl object-cover shadow-card"
+                                            />
+                                        </td>
+                                        <td className="px-4 py-4 font-semibold">
+                                            {dish.dishName}
+                                        </td>
+                                        <td className="hidden px-4 py-4 text-sm text-text-base/80 md:table-cell">
+                                            {dish.description}
+                                        </td>
+                                        <td className="px-4 py-4 font-semibold">
+                                            ${dish.price.toFixed(2)}
+                                        </td>
+                                        <td className="px-4 py-4 text-center">
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    addToCart(dish.dishName)
+                                                }
+                                                className="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white shadow-button transition hover:bg-[#ff1e4e]"
+                                            >
+                                                Add to Cart
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div className="mx-auto mt-16 flex max-w-5xl flex-col items-center gap-4">
+                    <div className="relative w-full overflow-hidden rounded-3xl bg-white shadow-card">
+                        <div
+                            className="flex w-full transition-transform duration-500 ease-in-out"
+                            style={{
+                                transform: `translateX(-${
+                                    currentSlide * 100
+                                }%)`,
+                            }}
+                        >
+                            {menuDishes.map((dish) => (
+                                <div
+                                    key={dish.dishName}
+                                    className="flex w-full flex-shrink-0 items-center justify-center bg-tertiary/60 p-6"
+                                >
+                                    <img
+                                        src={dish.imageURL}
+                                        alt={dish.dishName}
+                                        className="h-80 w-full max-w-3xl rounded-2xl object-cover"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={goToPrevSlide}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-text-base/70 p-3 text-white shadow-card transition hover:bg-text-base"
+                            aria-label="Previous slide"
+                        >
+                            &#8592;
+                        </button>
+                        <button
+                            type="button"
+                            onClick={goToNextSlide}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-text-base/70 p-3 text-white shadow-card transition hover:bg-text-base"
+                            aria-label="Next slide"
+                        >
+                            &#8594;
+                        </button>
+                    </div>
+                    <div className="flex gap-2">
+                        {menuDishes.map((dish, index) => (
+                            <button
+                                key={dish.dishName}
+                                type="button"
+                                aria-label={`Go to slide ${index + 1}`}
+                                onClick={() => setCurrentSlide(index)}
+                                className={`h-3 w-3 rounded-full transition ${
+                                    currentSlide === index
+                                        ? "bg-accent"
+                                        : "bg-secondary"
+                                }`}
+                            ></button>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {isCartOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+                    <div
+                        className="absolute inset-0 bg-black/40"
+                        onClick={() => setIsCartOpen(false)}
+                    ></div>
+                    <div className="relative w-full max-w-3xl rounded-3xl bg-white p-6 shadow-2xl">
+                        <div className="mb-6 flex items-center justify-between">
+                            <h2 className="font-secondary text-2xl text-accent">
+                                Your Cart
+                            </h2>
+                            <button
+                                type="button"
+                                onClick={() => setIsCartOpen(false)}
+                                className="text-3xl text-text-base transition hover:text-accent"
+                                aria-label="Close Cart"
+                            >
+                                &times;
+                            </button>
+                        </div>
+
+                        <div id="cart-list">
+                            {cart.length === 0 ? (
+                                <p className="text-center font-primary text-lg text-text-base/70">
+                                    Your cart is empty.
+                                </p>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-secondary/40">
+                                        <thead>
+                                            <tr className="bg-secondary/60 text-left text-sm font-semibold uppercase">
+                                                <th className="px-4 py-3">
+                                                    Item
+                                                </th>
+                                                <th className="px-4 py-3">
+                                                    Price
+                                                </th>
+                                                <th className="px-4 py-3">
+                                                    Qty
+                                                </th>
+                                                <th className="px-4 py-3">
+                                                    Subtotal
+                                                </th>
+                                                <th className="px-4 py-3"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-secondary/30">
+                                            {cart.map((item) => (
+                                                <tr key={item.dishName}>
+                                                    <td className="px-4 py-3 font-semibold">
+                                                        {item.dishName}
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        ${item.price.toFixed(2)}
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    setQuantity(
+                                                                        item.dishName,
+                                                                        item.quantity -
+                                                                            1
+                                                                    )
+                                                                }
+                                                                className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary font-bold"
+                                                            >
+                                                                -
+                                                            </button>
+                                                            <input
+                                                                type="number"
+                                                                min="1"
+                                                                value={
+                                                                    item.quantity
+                                                                }
+                                                                onChange={(
+                                                                    event
+                                                                ) =>
+                                                                    setQuantity(
+                                                                        item.dishName,
+                                                                        event
+                                                                            .target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                                className="w-16 rounded-lg border border-secondary/60 px-2 py-1 text-center"
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    setQuantity(
+                                                                        item.dishName,
+                                                                        item.quantity +
+                                                                            1
+                                                                    )
+                                                                }
+                                                                className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary font-bold"
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-3 font-semibold">
+                                                        $
+                                                        {(
+                                                            item.price *
+                                                            item.quantity
+                                                        ).toFixed(2)}
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                removeFromCart(
+                                                                    item.dishName
+                                                                )
+                                                            }
+                                                            className="text-sm font-semibold text-accent transition hover:underline"
+                                                        >
+                                                            Remove
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                            <div
+                                id="cart-summary"
+                                className="text-xl font-bold"
+                            >
+                                Total: ${cartTotal.toFixed(2)}
+                            </div>
+                            <div className="flex flex-wrap gap-3">
+                                <button
+                                    type="button"
+                                    onClick={clearCart}
+                                    className="rounded-xl border-2 border-accent px-6 py-2 font-semibold text-accent transition hover:bg-accent hover:text-white"
+                                >
+                                    Clear Cart
+                                </button>
+                                <button
+                                    type="button"
+                                    className="rounded-xl bg-accent px-6 py-2 font-semibold text-white transition hover:bg-[#ff1e4e]"
+                                >
+                                    Checkout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <section
+                id="contact"
+                className="bg-bg px-4 py-16 md:px-12 lg:px-20"
+            >
+                <div className="mx-auto flex max-w-6xl flex-col gap-12 rounded-3xl bg-white/80 p-8 shadow-card lg:flex-row">
+                    <div className="w-full rounded-3xl bg-primary/80 p-8 text-text-base lg:w-1/2">
+                        <h1 className="font-secondary text-3xl text-accent">
+                            Contact Us ౨ৎ
+                        </h1>
+                        <form className="mt-6 flex flex-col gap-4">
+                            <label
+                                className="font-semibold uppercase tracking-wide"
+                                htmlFor="name"
+                            >
+                                Name
+                            </label>
+                            <input
+                                className="rounded-xl border border-secondary/60 px-4 py-3 focus:border-accent focus:outline-none"
+                                type="text"
+                                id="name"
+                                name="name"
+                                required
+                            />
+
+                            <label
+                                className="font-semibold uppercase tracking-wide"
+                                htmlFor="email"
+                            >
+                                Email
+                            </label>
+                            <input
+                                className="rounded-xl border border-secondary/60 px-4 py-3 focus:border-accent focus:outline-none"
+                                type="email"
+                                id="email"
+                                name="email"
+                                required
+                            />
+
+                            <label
+                                className="font-semibold uppercase tracking-wide"
+                                htmlFor="message"
+                            >
+                                Message
+                            </label>
+                            <textarea
+                                className="rounded-xl border border-secondary/60 px-4 py-3 focus:border-accent focus:outline-none"
+                                id="message"
+                                name="message"
+                                rows="5"
+                                required
+                            ></textarea>
+
+                            <button
+                                type="submit"
+                                className={primaryButtonClasses}
+                            >
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+
+                    <div className="w-full rounded-3xl bg-secondary/50 p-2 lg:w-1/2">
+                        <iframe
+                            title="Strawbeary Cafe map"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.685701330998!2d-73.98601769999999!3d40.7469409!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259e9eb0c8785%3A0x5148f2b276a151cd!2sSeoul%20Sweets!5e0!3m2!1sen!2sus!4v1759650616290!5m2!1sen!2sus"
+                            className="h-[450px] w-full rounded-2xl border-0"
+                            loading="lazy"
+                            allowFullScreen
+                            referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                    </div>
+                </div>
+            </section>
+
+            <section
+                id="footer"
+                className="bg-pink-stripes px-4 py-10 text-center text-text-base shadow-inner"
+            >
+                <footer className="mx-auto flex max-w-5xl flex-col items-center gap-4 rounded-3xl bg-white/75 p-6">
+                    <p className="font-primary text-sm text-text-base/90">
+                        &copy; 2024 Strawbeary Cafe. All rights reserved.
+                    </p>
+                    <div className="flex items-center gap-4">
+                        <a
+                            href="https://facebook.com/strawbearycafe"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Facebook"
+                            className="text-accent transition hover:text-text-base"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                            </svg>
+                        </a>
+                        <span className="text-text-base/30">|</span>
+                        <a
+                            href="https://instagram.com/strawbearycafe"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Instagram"
+                            className="text-accent transition hover:text-text-base"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <rect
+                                    width="20"
+                                    height="20"
+                                    x="2"
+                                    y="2"
+                                    rx="5"
+                                    ry="5"
+                                />
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                            </svg>
+                        </a>
+                        <span className="text-text-base/30">|</span>
+                        <a
+                            href="https://twitter.com/strawbearycafe"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Twitter"
+                            className="text-accent transition hover:text-text-base"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+                                <path d="M9 18c-4.51 2-5-2-7-2" />
+                            </svg>
+                        </a>
+                    </div>
+
+                    <div className="space-y-1 text-sm">
+                        <p>
+                            Email:{" "}
+                            <a
+                                className="text-accent underline"
+                                href="mailto:info@strawbearycafe.com"
+                            >
+                                info@strawbearycafe.com
+                            </a>
+                        </p>
+                        <p>
+                            Phone:{" "}
+                            <a
+                                className="text-accent underline"
+                                href="tel:+1234567890"
+                            >
+                                (123) 456-7890
+                            </a>
+                        </p>
+                        <p>
+                            Business Hours: Mon - Fri 8am - 8pm, Sat - Sun 9am -
+                            5pm
+                        </p>
+                    </div>
+                </footer>
             </section>
         </>
     );
