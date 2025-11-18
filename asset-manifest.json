@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/strawbeary-react/static/css/main.c629e71f.css",
+    "main.js": "/strawbeary-react/static/js/main.9abbc3a6.js",
+    "static/js/453.82b023b3.chunk.js": "/strawbeary-react/static/js/453.82b023b3.chunk.js",
+    "static/media/threecake.png": "/strawbeary-react/static/media/threecake.c74f333ea32acf99d3bf.png",
+    "static/media/cakeslice.webp": "/strawbeary-react/static/media/cakeslice.6e751ac23846935e4986.webp",
+    "static/media/cake.png": "/strawbeary-react/static/media/cake.dd8bbc925fda9e0cae65.png",
+    "static/media/drink2.webp": "/strawbeary-react/static/media/drink2.d412208c786a56181f9c.webp",
+    "static/media/drink.png": "/strawbeary-react/static/media/drink.8788745e26dd5b126846.png",
+    "static/media/latte.webp": "/strawbeary-react/static/media/latte.3420e2860b4086aef3e1.webp",
+    "index.html": "/strawbeary-react/index.html",
+    "main.c629e71f.css.map": "/strawbeary-react/static/css/main.c629e71f.css.map",
+    "main.9abbc3a6.js.map": "/strawbeary-react/static/js/main.9abbc3a6.js.map",
+    "453.82b023b3.chunk.js.map": "/strawbeary-react/static/js/453.82b023b3.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c629e71f.css",
+    "static/js/main.9abbc3a6.js"
+  ]
+}
