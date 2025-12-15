@@ -1,54 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import threecake from "./images/threecake.png";
-import cake from "./images/cake.png";
-import cakeslice from "./images/cakeslice.webp";
-import drink from "./images/drink.png";
-import drink2 from "./images/drink2.webp";
-import latte from "./images/latte.webp";
-const menuDishes = [
-    {
-        dishName: "Strawbeary Jam",
-        description:
-            "A delightful jammy dessert made from fresh strawberries and a hint of mint.",
-        price: 5.99,
-        imageURL: cake,
-    },
-    {
-        dishName: "Strawbeary Delight",
-        description:
-            "A layered dessert with strawberries, cream, and fluffy cake.",
-        price: 6.49,
-        imageURL: cakeslice,
-    },
-    {
-        dishName: "Strawbeary Combo",
-        description:
-            "Get three flavors of our signature cupcakes in one combo!",
-        price: 24.99,
-        imageURL: threecake,
-    },
-    {
-        dishName: "Strawbeary Sparkle",
-        description:
-            "A refreshing blend of strawberries and sparkling water. Hints of refreshing mint.",
-        price: 12.99,
-        imageURL: drink,
-    },
-    {
-        dishName: "Strawbeary Juice",
-        description:
-            "An aromatic juice made from fresh strawberries and a hint of mint.",
-        price: 6.99,
-        imageURL: drink2,
-    },
-    {
-        dishName: "Strawbeary Latte",
-        description:
-            "A creamy latte made with fresh strawberries, milk, and a touch of honey.",
-        price: 7.49,
-        imageURL: latte,
-    },
-];
 
 const CART_KEY = "strawbeary_cart";
 
@@ -74,20 +25,72 @@ const primaryButtonClasses =
 
 function App() {
     const [cart, setCart] = useState(getStoredCart);
+    const [menuItems, setMenuItems] = useState([]);
+    const [menuLoading, setMenuLoading] = useState(true);
+    const [menuError, setMenuError] = useState("");
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
 
-    const updateCart = useCallback((updater) => {
-        setCart((prevCart) => {
-            const nextCart =
-                typeof updater === "function" ? updater(prevCart) : updater;
-            if (typeof window !== "undefined") {
-                window.localStorage.setItem(CART_KEY, JSON.stringify(nextCart));
+    // Simple client-side session id for cart/order persistence
+    const [sessionId] = useState(() => {
+        if (typeof window === "undefined") return "";
+        const existing = window.localStorage.getItem("STRAWBEARY_SESSION_ID");
+        if (existing) return existing;
+        const id = `sess_${Math.random()
+            .toString(36)
+            .slice(2)}${Date.now().toString(36)}`;
+        window.localStorage.setItem("STRAWBEARY_SESSION_ID", id);
+        return id;
+    });
+
+    useEffect(() => {
+        async function fetchMenu() {
+            try {
+                setMenuLoading(true);
+                setMenuError("");
+                const response = await fetch("/api/menu");
+                if (!response.ok) {
+                    throw new Error("Failed to load menu");
+                }
+                const data = await response.json();
+                setMenuItems(data);
+            } catch (error) {
+                console.error(error);
+                setMenuError(
+                    "Unable to load menu right now. Please try again later."
+                );
+            } finally {
+                setMenuLoading(false);
             }
-            return nextCart;
-        });
+        }
+        fetchMenu();
     }, []);
+
+    const updateCart = useCallback(
+        (updater) => {
+            setCart((prevCart) => {
+                const nextCart =
+                    typeof updater === "function" ? updater(prevCart) : updater;
+                if (typeof window !== "undefined") {
+                    window.localStorage.setItem(
+                        CART_KEY,
+                        JSON.stringify(nextCart)
+                    );
+                    // Persist cart in backend as well
+                    fetch("/api/cart", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ sessionId, items: nextCart }),
+                    }).catch((error) =>
+                        console.warn("Failed to sync cart with server", error)
+                    );
+                }
+                return nextCart;
+            });
+        },
+        [sessionId]
+    );
 
     const cartCount = useMemo(
         () => cart.reduce((total, item) => total + item.quantity, 0),
@@ -101,7 +104,7 @@ function App() {
 
     const addToCart = useCallback(
         (dishName) => {
-            const dish = menuDishes.find((item) => item.dishName === dishName);
+            const dish = menuItems.find((item) => item.name === dishName);
             if (!dish) return;
             updateCart((prevCart) => {
                 const existing = prevCart.find(
@@ -116,11 +119,11 @@ function App() {
                 }
                 return [
                     ...prevCart,
-                    { dishName, price: dish.price, quantity: 1 },
+                    { dishName: dish.name, price: dish.price, quantity: 1 },
                 ];
             });
         },
-        [updateCart]
+        [menuItems, updateCart]
     );
 
     const removeFromCart = useCallback(
@@ -150,14 +153,36 @@ function App() {
         updateCart([]);
     }, [updateCart]);
 
+    const handleCheckout = useCallback(async () => {
+        if (!cart.length) return;
+        try {
+            await fetch("/api/orders", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    sessionId,
+                    items: cart,
+                    total: cartTotal,
+                }),
+            });
+            clearCart();
+            alert("Thank you! Your order has been placed.");
+            setIsCartOpen(false);
+        } catch (error) {
+            console.error("Failed to place order", error);
+            alert("Sorry, we could not place your order. Please try again.");
+        }
+    }, [cart, cartTotal, clearCart, sessionId]);
+
     const goToPrevSlide = () => {
         setCurrentSlide(
-            (prev) => (prev - 1 + menuDishes.length) % menuDishes.length
+            (prev) =>
+                (prev - 1 + (menuItems.length || 1)) / (menuItems.length || 1)
         );
     };
 
     const goToNextSlide = () => {
-        setCurrentSlide((prev) => (prev + 1) % menuDishes.length);
+        setCurrentSlide((prev) => (prev + 1) % (menuItems.length || 1));
     };
 
     const handleNavClick = () => setIsMenuOpen(false);
@@ -323,59 +348,69 @@ function App() {
                     <h1 className="font-secondary text-3xl text-accent">
                         Our Menu
                     </h1>
-                    <div className="mt-8 overflow-x-auto rounded-3xl bg-white shadow-card">
-                        <table className="min-w-full divide-y divide-secondary/60 text-left">
-                            <thead className="bg-primary/60 text-sm font-semibold uppercase text-text-base">
-                                <tr>
-                                    <th className="px-4 py-3">Image</th>
-                                    <th className="px-4 py-3">Dish Name</th>
-                                    <th className="px-4 py-3 hidden md:table-cell">
-                                        Description
-                                    </th>
-                                    <th className="px-4 py-3">Price</th>
-                                    <th className="px-4 py-3 text-center">
-                                        Action
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-secondary/30 text-base">
-                                {menuDishes.map((dish) => (
-                                    <tr
-                                        key={dish.dishName}
-                                        className="hover:bg-tertiary/50"
-                                    >
-                                        <td className="px-4 py-4">
-                                            <img
-                                                src={dish.imageURL}
-                                                alt={dish.dishName}
-                                                className="h-32 w-32 rounded-2xl object-cover shadow-card"
-                                            />
-                                        </td>
-                                        <td className="px-4 py-4 font-semibold">
-                                            {dish.dishName}
-                                        </td>
-                                        <td className="hidden px-4 py-4 text-sm text-text-base/80 md:table-cell">
-                                            {dish.description}
-                                        </td>
-                                        <td className="px-4 py-4 font-semibold">
-                                            ${dish.price.toFixed(2)}
-                                        </td>
-                                        <td className="px-4 py-4 text-center">
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    addToCart(dish.dishName)
-                                                }
-                                                className="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white shadow-button transition hover:bg-[#ff1e4e]"
-                                            >
-                                                Add to Cart
-                                            </button>
-                                        </td>
+                    {menuLoading ? (
+                        <p className="mt-6 text-text-base/80">
+                            Loading menu...
+                        </p>
+                    ) : menuError ? (
+                        <p className="mt-6 text-red-600">{menuError}</p>
+                    ) : (
+                        <div className="mt-8 overflow-x-auto rounded-3xl bg-white shadow-card">
+                            <table className="min-w-full divide-y divide-secondary/60 text-left">
+                                <thead className="bg-primary/60 text-sm font-semibold uppercase text-text-base">
+                                    <tr>
+                                        <th className="px-4 py-3">Image</th>
+                                        <th className="px-4 py-3">Dish Name</th>
+                                        <th className="px-4 py-3 hidden md:table-cell">
+                                            Description
+                                        </th>
+                                        <th className="px-4 py-3">Price</th>
+                                        <th className="px-4 py-3 text-center">
+                                            Action
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody className="divide-y divide-secondary/30 text-base">
+                                    {menuItems.map((dish) => (
+                                        <tr
+                                            key={dish._id}
+                                            className="hover:bg-tertiary/50"
+                                        >
+                                            <td className="px-4 py-4">
+                                                {dish.imageURL && (
+                                                    <img
+                                                        src={dish.imageURL}
+                                                        alt={dish.name}
+                                                        className="h-32 w-32 rounded-2xl object-cover shadow-card"
+                                                    />
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-4 font-semibold">
+                                                {dish.name}
+                                            </td>
+                                            <td className="hidden px-4 py-4 text-sm text-text-base/80 md:table-cell">
+                                                {dish.description}
+                                            </td>
+                                            <td className="px-4 py-4 font-semibold">
+                                                ${dish.price.toFixed(2)}
+                                            </td>
+                                            <td className="px-4 py-4 text-center">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        addToCart(dish.name)
+                                                    }
+                                                    className="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white shadow-button transition hover:bg-[#ff1e4e]"
+                                                >
+                                                    Add to Cart
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
 
                 <div className="mx-auto mt-16 flex max-w-5xl flex-col items-center gap-4">
@@ -388,14 +423,14 @@ function App() {
                                 }%)`,
                             }}
                         >
-                            {menuDishes.map((dish) => (
+                            {menuItems.map((dish) => (
                                 <div
-                                    key={dish.dishName}
+                                    key={dish._id}
                                     className="flex w-full flex-shrink-0 items-center justify-center bg-tertiary/60 p-6"
                                 >
                                     <img
                                         src={dish.imageURL}
-                                        alt={dish.dishName}
+                                        alt={dish.name}
                                         className="h-80 w-full max-w-3xl rounded-2xl object-cover"
                                     />
                                 </div>
@@ -419,9 +454,9 @@ function App() {
                         </button>
                     </div>
                     <div className="flex gap-2">
-                        {menuDishes.map((dish, index) => (
+                        {menuItems.map((dish, index) => (
                             <button
-                                key={dish.dishName}
+                                key={dish._id}
                                 type="button"
                                 aria-label={`Go to slide ${index + 1}`}
                                 onClick={() => setCurrentSlide(index)}
@@ -584,6 +619,7 @@ function App() {
                                 </button>
                                 <button
                                     type="button"
+                                    onClick={handleCheckout}
                                     className="rounded-xl bg-accent px-6 py-2 font-semibold text-white transition hover:bg-[#ff1e4e]"
                                 >
                                     Checkout
