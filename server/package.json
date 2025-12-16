@@ -4,8 +4,9 @@
   "private": true,
   "main": "src/index.js",
   "scripts": {
-    "start": "NODE_ENV=production node src/index.js",
-    "dev": "NODE_ENV=development nodemon src/index.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "seed": "node seed.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
